@@ -25,7 +25,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 # ACQUIRE DATA
 path = os.path.dirname(os.path.realpath(__file__))
-train_df = pd.read_csv(path+"/input/train.csv")
+train_df = pd.read_csv(path+"/train.csv")
 #print(train_df.columns.values)
 
 # GET GENERAL INFORMATION
