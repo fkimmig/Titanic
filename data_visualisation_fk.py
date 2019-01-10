@@ -43,7 +43,7 @@ def is_child(person):
     age,sex = person
     return 'child' if age < child_age else sex
     
-data_training_raw['Person'] = data_training_raw[['Age','Sex']].apply(is_child,axis=1)
+data_training_raw['Person'] = data_training_raw[['Age','Sex']].apply(is_child,axis=1) # axis = 1 : data in column
 
 # --- data visualisation
 categories =  [ 'Pclass', 'Sex', 'Fare', 'Age', 'Person']
@@ -51,7 +51,14 @@ categories =  [ 'Pclass', 'Sex', 'Fare', 'Age', 'Person']
 fig = plt.figure(figsize=(30, 10))
 for i in range (0,len(categories)):
     fig.add_subplot(3,3,i+1)
-    sns.countplot(x=categories[i], data=data_training_raw);  
+    if categories[i] == 'Age':
+        plt.hist(x=categories[i], data=data_training_raw, bins = 20, label='Age')
+        plt.xlabel("Age")
+    elif categories[i] == 'Fare':
+        plt.hist(x=categories[i], data=data_training_raw, bins = 20)
+        plt.xlabel("Fare")
+    else:
+        sns.countplot(x=categories[i], data=data_training_raw)  
 
 i=i+1
 fig.add_subplot(3,3,i+1)
