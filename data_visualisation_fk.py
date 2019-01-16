@@ -52,7 +52,7 @@ fig = plt.figure(figsize=(30, 10))
 for i in range (0,len(categories)):
     fig.add_subplot(3,3,i+1)
     if categories[i] == 'Age':
-        plt.hist(x=categories[i], data=data_training_raw, bins = 20, label='Age')
+        plt.hist(x=categories[i], data=data_clean_age, bins = 20, label='Age')
         plt.xlabel("Age")
     elif categories[i] == 'Fare':
         plt.hist(x=categories[i], data=data_training_raw, bins = 20)
@@ -75,11 +75,11 @@ sns.countplot(x="Pclass", hue='Survived', data=data_training_raw)
 
 sns.catplot(x="Pclass", hue="Person", col="Survived",data=data_training_raw, kind="count",height=4, aspect=.7)
 
-sns.factorplot("Pclass", "Survived", "Person", data=data_training_raw, kind="bar", legend=True)
+sns.catplot("Pclass", "Survived", "Person", data=data_training_raw, kind="bar", legend=True)
 
-sns.factorplot("Pclass", "Survived", data=data_training_raw, kind="bar", legend=True)
+sns.catplot("Pclass", "Survived", data=data_training_raw, kind="bar", legend=True)
 
-sns.factorplot("Person", "Survived", data=data_training_raw, kind="bar", legend=True)
+sns.catplot("Person", "Survived", data=data_training_raw, kind="bar", legend=True)
 
 # i=i+1
 # fig.add_subplot(3,3,i+1)
@@ -118,5 +118,6 @@ plt.show()
 
 # data_training_raw.hist(bins=50, figsize=(20,15))
 # plt.show()
+
 
 
