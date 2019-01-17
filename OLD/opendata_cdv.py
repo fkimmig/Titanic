@@ -6,7 +6,6 @@ import os
 import sys
 # Data analysis ans wrangling
 import numpy as np
-import math
 import pandas as pd
 import random as random
 # Data visualization
@@ -23,10 +22,16 @@ from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+################################################################################
+################################################################################
 # ACQUIRE DATA
 path = os.path.dirname(os.path.realpath(__file__))
 train_df = pd.read_csv(path+"/train.csv")
+test_df = pd.read_csv(path+"/test.csv")
 #print(train_df.columns.values)
+################################################################################
+################################################################################
+
 
 # GET GENERAL INFORMATION
 ## Get counting values and type
@@ -49,7 +54,10 @@ nb_survival = train_df["Survived"].sum()
 # SORTING DATA - Reset Index
 #train_df.sort_values(by=["Age"],ascending=False).reset_index()
 
-# REPLACE NAN VALUE
+################################################################################
+################################################################################
+
+## REPLACE NAN VALUE
 #nb_nan = train_df.isnull().sum().sum()
 #nb_nan = train_df.isnull().any()
 #print(nb_nan)
@@ -65,6 +73,15 @@ print("######################################")
 #age_1.map(plt.hist, 'Age', bins=20)
 #age_c = sns.FacetGrid(train_df_c, col='Survived')
 #age_c.map(plt.hist, 'Age', bins=20)
+## REMOVE ROWS
+train_df= train_df[train_df["Age"]>0]
+train_df.dropna(subset=["Age"])
+test_df= test_df[test_df["Age"]>0]
+test_df.dropna(subset=["Age"])
+
+combine = [train_df, test_df]
+################################################################################
+################################################################################
 
 
 # Syblings - level of survival
@@ -86,9 +103,9 @@ survival_parch = train_df[["Survived", "Parch"]].groupby(['Survived'], as_index=
 #print(survival_parch)
 
 ### HISTOGRAM - survival according to sibligns
-#grid = sns.FacetGrid(train_df, col='Survived', row='SibSp', height=2.2, aspect=1.6)
-#grid.map(plt.hist, 'Age', alpha=.5, bins=100)
-#grid.add_legend()
+# grid = sns.FacetGrid(train_df, col='Survived', row='SibSp', height=2.2, aspect=1.6)
+# grid.map(plt.hist, 'Age', alpha=.5, bins=100)
+# grid.add_legend()
 
 #Syblings - Parent Children comparaison
 cross_sbp = pd.crosstab(train_df["SibSp"],train_df["Parch"])
@@ -101,36 +118,48 @@ syb_parch = train_df[["SibSp", "Parch"]].groupby(['SibSp'], as_index=False)\
 #print("######################################")
 
 # Transform Sibs to binary
-test_df = map(lambda x: x if (x==0) else 1, train_df["SibSp"])
-train_df["SibSp"]=list(test_df)
+for dataset in combine:
+    temp_df = map(lambda x: x if (x==0) else 1, dataset["SibSp"])
+    dataset["SibSp"]=list(temp_df)
 cross_sbp = pd.crosstab(train_df["SibSp"],train_df["Parch"])
 print(cross_sbp)
 print("######################################")
 
+###############################################################################
+###############################################################################
+
 # Add an information - Adult/Children
-test_df = map(lambda x: 0 if (x<18) else 1, train_df["Age"])
-train_df["Adultw"] = list(test_df)
+for dataset in combine :
+    temp_df = map(lambda x: 0 if (x<16) else 1, dataset["Age"])
+    dataset["Adultw"] = list(temp_df)
 cross_ap = pd.crosstab(train_df["Adultw"],train_df["Parch"])
 print(cross_ap)
-print("there are 32 lonely children on board")
-print("there is 1 person who is at the same time a children and a parent")
-print("And most probably his/her children is aged of {} year".format(train_df.Age.min()))
 print("######################################")
 
-# Transform Parch to 
-# 0 - adult, no parch 
+# Transform Parch to
+# 0 - adult, no parch
 # 1 - is a parent and has a children on board
 # 2 - is a children and has a parent on board
 # 3 - is a children, no parch
-train_df.loc[(train_df['Adultw'] == 1)&(train_df['Parch'] == 0), 'Parch'] = 0
-train_df.loc[(train_df['Adultw'] ==1) & (train_df['Parch'] >0), 'Parch'] = 1
-train_df.loc[(train_df['Adultw'] ==0) & (train_df['Parch'] >0), 'Parch'] = 2
-train_df.loc[(train_df['Adultw'] ==0) & (train_df['Parch'] == 0), 'Parch'] = 3
+for dataset in combine:
+    dataset.loc[(dataset['Adultw'] ==1)&(dataset['Parch'] == 0), 'Parch'] = 0
+    dataset.loc[(dataset['Adultw'] ==1)&(dataset['Parch'] >0), 'Parch'] = 1
+    dataset.loc[(dataset['Adultw'] ==0)&(dataset['Parch'] >0), 'Parch'] = 2
+    dataset.loc[(dataset['Adultw'] ==0)&(dataset['Parch'] == 0), 'Parch'] = 3
+
 # Probabylity of survival P(S|Parch = i)
 parch_surv = train_df[["Survived", "Parch"]].groupby(['Parch'], as_index=False)\
 .mean().sort_values(by='Survived', ascending=False)
 print("PROBABILITE CONDITIONNELLE DE SURVIE")
 print(parch_surv)
+print("######################################")
+
+### HISTOGRAM - survival according to sibligns
+# grid = sns.FacetGrid(train_df, col='Adultw')
+grid = sns.FacetGrid(train_df, row='Adultw', height=2.2, aspect=1.6)
+grid.map(plt.plot, "Parch", "Survived", marker=".")
+grid.add_legend()
+
 # Total probability of survival P(SnParch=i)
 parch_surv = train_df[["Survived", "Parch"]].groupby(['Parch'], as_index=False)\
 .sum().sort_values(by='Survived', ascending=False)
@@ -143,3 +172,19 @@ parch_surv["Survived"] = parch_surv["Survived"]/nb_pass
 print("PROBABILITE TOTALE DE SURVIE ET DE PARCH")
 print(parch_surv)
 
+##################################################################################
+### MODEL - PREDICT - SOLVE
+# Preparing data
+X_train = train_df.drop("Survived", axis=1)
+Y_train = train_df["Survived"]
+X_test  = test_df.drop("PassengerId", axis=1).copy()
+print(X_train.shape, Y_train.shape, X_test.shape)
+
+# Lorgistic regression
+# logreg = LogisticRegression()
+# logreg.fit(X_train, Y_train)
+# Y_pred = logreg.predict(X_test)
+# acc_log = round(logreg.score(X_train, Y_train) * 100, 2)
+# print(acc_log)
+
+plt.show()
