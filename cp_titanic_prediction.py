@@ -6,15 +6,20 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+use_class_column = 1
+
 ###########Import data
 ###load data
 training_file = pd.read_csv('./train.csv')
 test_file = pd.read_csv('./test.csv')
 
 ###########Choose and clean relevant data
-###keep only 'Sex' 'Age' and 'Survived'
+###keep only 'Sex' 'Age' 'Class' and 'Survived'
 train_data = training_file
-train_data = train_data.drop(['PassengerId', 'Pclass', 'Name', 'SibSp','Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
+if use_class_column == 0:
+    train_data = train_data.drop(['PassengerId', 'Name', 'Pclass', 'SibSp','Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
+else:
+    train_data = train_data.drop(['PassengerId', 'Name', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
 ###replace sex by float
 sex_dict = {'male':0,'female':1}
 train_data = train_data.replace(sex_dict)
@@ -25,7 +30,11 @@ train_target = train_data["Survived"]
 train_data = train_data.drop('Survived',axis=1)
 
 ###same on test data
-test_data = test_file.drop(['PassengerId', 'Pclass', 'Name', 'SibSp','Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
+test_data = test_file
+if use_class_column== 0:
+    test_data = test_data.drop(['PassengerId', 'Name', 'Pclass', 'SibSp','Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
+else:
+    test_data = test_data.drop(['PassengerId', 'Name', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'], axis=1)
 test_data = test_data.replace(sex_dict)
 test_data = test_data.dropna()
 
@@ -41,6 +50,7 @@ randomforest_acc = RandomForestClassifier()
 randomforest_acc.fit(x_train, y_train)
 y_pred = randomforest_acc.predict(x_val)
 acc_randomforest = round(accuracy_score(y_pred, y_val) * 100, 2)
+print('##########################################')
 print('accuracy if no change in age column',acc_randomforest)
 
 ##########Evaluate accuracy for age bins
@@ -57,4 +67,9 @@ randomforest_acc2 = RandomForestClassifier()
 randomforest_acc2.fit(x_train, y_train)
 y_pred = randomforest_acc2.predict(x_val)
 acc_randomforest2 = round(accuracy_score(y_pred, y_val) * 100, 2)
+print('##########################################')
 print('accuracy if age categories',acc_randomforest2)
+
+###
+#Conclusion : avec les catégories d'age on améliore
+# si on rajoute la colonne des classes, on améliore et on diminue l'écart entre avec et sans catégorie d'age
