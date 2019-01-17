@@ -39,6 +39,7 @@ test_df = pd.read_csv(path+"/test.csv")
 ## Get counting of each label
 nb_pass = train_df["PassengerId"].size
 nb_survival = train_df["Survived"].sum()
+print("La probabilité de survie est {}".format(nb_survival/nb_pass))
 ## Sum specific label/column
 #print(train_df.Parch.sum())
 #print(train_df.Parch.min())
@@ -172,19 +173,5 @@ parch_surv["Survived"] = parch_surv["Survived"]/nb_pass
 print("PROBABILITE TOTALE DE SURVIE ET DE PARCH")
 print(parch_surv)
 
-##################################################################################
-### MODEL - PREDICT - SOLVE
-# Preparing data
-X_train = train_df.drop("Survived", axis=1)
-Y_train = train_df["Survived"]
-X_test  = test_df.drop("PassengerId", axis=1).copy()
-print(X_train.shape, Y_train.shape, X_test.shape)
 
-# Lorgistic regression
-# logreg = LogisticRegression()
-# logreg.fit(X_train, Y_train)
-# Y_pred = logreg.predict(X_test)
-# acc_log = round(logreg.score(X_train, Y_train) * 100, 2)
-# print(acc_log)
-
-plt.show()
+#plt.show()
