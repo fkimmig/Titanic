@@ -2,9 +2,14 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
-#load training data
+###########Import data
+###load data
 train_data = pd.read_csv('./train.csv')
+
 # print data
 # print data.head()
 # print data.tail()
@@ -75,5 +80,16 @@ sns.barplot(x='AgeGroupCat2', y='Survived', data=train_data)
 plt.subplot(121)
 plt.title('Data state')
 train_data['AgeGroupCat2'].value_counts().loc[labels4].plot(kind='bar')
+#last one
+plt.figure()
+plt.subplot(122)
+plt.title('Survival rate')
+bins5 = [0, 5, 18, 40, np.inf]
+labels5 = ['0', '1', '2', '3']
+train_data['AgeGroupCat3'] = pd.cut(train_data['Age'], bins5, labels=labels5)
+sns.barplot(x='AgeGroupCat3', y='Survived', data=train_data)
+plt.subplot(121)
+plt.title('Data state')
+train_data['AgeGroupCat3'].value_counts().loc[labels5].plot(kind='bar')
 
 plt.show()
