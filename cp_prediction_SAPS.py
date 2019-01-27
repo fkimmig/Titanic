@@ -4,8 +4,8 @@ from sklearn.metrics import accuracy_score
 
 
 ###########Import data
-train_file = pd.read_csv('Cecile/train_SAPS.csv')
-test_file = pd.read_csv('Cecile/test_SAPS.csv')
+train_file = pd.read_csv('CP/train_SAPS.csv')
+test_file = pd.read_csv('CP/test_SAPS.csv')
 
 ##########Function to predict
 def predict_randomforest(train, test):
