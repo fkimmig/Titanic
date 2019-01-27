@@ -6,6 +6,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+# tester sur train
+# generer les sets pour les avoir et pouvoir comparer
+
 use_class_column = 1
 
 ###########Import data
